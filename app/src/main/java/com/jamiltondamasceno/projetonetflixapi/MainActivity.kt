@@ -2,27 +2,93 @@ package com.jamiltondamasceno.projetonetflixapi
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import com.jamiltondamasceno.projetonetflixapi.api.FilmeAPI
 import com.jamiltondamasceno.projetonetflixapi.api.RetrofitService
 import com.jamiltondamasceno.projetonetflixapi.databinding.ActivityMainBinding
+import com.jamiltondamasceno.projetonetflixapi.model.FilmeRecente
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "info_filme"
     private val binding by lazy {
-        ActivityMainBinding.inflate( layoutInflater )
+        ActivityMainBinding.inflate(layoutInflater)
     }
 
     private val filmeAPI by lazy {
         RetrofitService.filmeAPI
     }
 
+    var jobFilmeRecente: Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView( binding.root )
-
-
+        setContentView(binding.root)
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        recuperarFilmeRecente()
+    }
 
+    private fun recuperarFilmeRecente() {
+        jobFilmeRecente = CoroutineScope(Dispatchers.IO).launch {
+            var resposta: Response<FilmeRecente>? = null
+
+            try {
+                resposta = filmeAPI.recuperarFilmeRecente()
+            } catch (e: Exception) {
+                exibirMensagem("Erro ao fazer a requisicao")
+            }
+
+            if (resposta != null) {
+                if (resposta.isSuccessful) {
+
+                    val filmeRecente = resposta.body()
+                    val nomeImagem = filmeRecente?.poster_path
+                    //val titulo = filmeRecente?.title
+                    val url = RetrofitService.BASE_URL_IMAGEM + "w780" + nomeImagem
+
+                    withContext(Dispatchers.Main) {
+
+                       /* val texto = "titulo: $titulo url: $url"
+                        binding.textPopulares.text = texto*/
+                        Picasso.get()
+                            .load(url)
+                            .error(R.drawable.capa)
+                            .into(binding.imgCapa)
+                    }
+
+                } else {
+                    exibirMensagem("Problema ao fazer a requisicao CODE: ${resposta.code()}")
+                }
+            } else {
+                exibirMensagem("Nao foi possivel fazer a requisicao")
+            }
+        }
+    }
+
+    private fun exibirMensagem(mensagem: String) {
+
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(
+                applicationContext,
+                mensagem,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        jobFilmeRecente?.cancel()
+    }
 }
