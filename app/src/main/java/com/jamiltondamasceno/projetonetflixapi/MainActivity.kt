@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.jamiltondamasceno.projetonetflixapi.adapter.FilmeAdapter
 import com.jamiltondamasceno.projetonetflixapi.api.FilmeAPI
 import com.jamiltondamasceno.projetonetflixapi.api.RetrofitService
 import com.jamiltondamasceno.projetonetflixapi.databinding.ActivityMainBinding
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         RetrofitService.filmeAPI
     }
 
+    private lateinit var filmeAdapter: FilmeAdapter
+
     var jobFilmeRecente: Job? = null
     var jobFilmesPopulares: Job? = null
 
@@ -35,6 +39,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        inicializarViews()
+
+    }
+
+    private fun inicializarViews() {
+
+        filmeAdapter = FilmeAdapter()
+        binding.rvPopulares.adapter = filmeAdapter
+
+        binding.rvPopulares.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
     }
 
     override fun onStart() {
@@ -59,10 +77,19 @@ class MainActivity : AppCompatActivity() {
                     val filmeResposta = resposta.body()
                     val listaFilmes = filmeResposta?.filmes
                     if (listaFilmes != null && listaFilmes.isNotEmpty()){
-                        Log.i("filmes_api", "lista Filmes: ")
+
+                       /* Log.i("filmes_api", "lista Filmes: ")
                         listaFilmes.forEach { filme ->
                             Log.i("filmes_api", "Titulo: ${filme.title} ")
+                        }*/
+
+                        withContext(Dispatchers.Main){
+
+                            filmeAdapter.adicionarLista(listaFilmes)
+
                         }
+
+
                     }
 
 
