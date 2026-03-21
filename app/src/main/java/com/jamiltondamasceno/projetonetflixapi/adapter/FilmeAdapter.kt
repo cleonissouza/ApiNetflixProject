@@ -9,7 +9,7 @@ import com.jamiltondamasceno.projetonetflixapi.model.Filme
 import com.squareup.picasso.Picasso
 
 class FilmeAdapter(
-
+    val onClick: (Filme) -> Unit
 ) : RecyclerView.Adapter<FilmeAdapter.FilmeViewHolder>() {
 
 
@@ -35,6 +35,9 @@ class FilmeAdapter(
                 .into(binding.imgItemFilme)
 
             binding.textTitulo.text = filme.title
+            binding.clItem.setOnClickListener {
+                onClick(filme)
+            }
 
         }
 
