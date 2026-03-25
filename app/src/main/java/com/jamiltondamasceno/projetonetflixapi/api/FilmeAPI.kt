@@ -4,6 +4,7 @@ import com.jamiltondamasceno.projetonetflixapi.model.FilmeRecente
 import com.jamiltondamasceno.projetonetflixapi.model.FilmeResposta
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface FilmeAPI {
 
@@ -11,5 +12,7 @@ interface FilmeAPI {
     suspend fun recuperarFilmeRecente() : Response<FilmeRecente>
 
     @GET("movie/popular?api_key=${RetrofitService.API_KEY}")
-    suspend fun recuperarFilmesPopulares() : Response<FilmeResposta>
+    suspend fun recuperarFilmesPopulares(
+        @Query("page") pagina: Int
+    ) : Response<FilmeResposta>
 }

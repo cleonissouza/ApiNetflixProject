@@ -13,10 +13,10 @@ class FilmeAdapter(
 ) : RecyclerView.Adapter<FilmeAdapter.FilmeViewHolder>() {
 
 
-    private var listaFilmes: List<Filme> = emptyList()
+    private var listaFilmes = mutableListOf<Filme>()
 
     fun adicionarLista(lista: List<Filme>){
-        this.listaFilmes = lista
+        this.listaFilmes.addAll(lista) //20 + 20 + 20 ...
         notifyDataSetChanged()
     }
     inner class FilmeViewHolder(val binding: ItemFilmeBinding)
