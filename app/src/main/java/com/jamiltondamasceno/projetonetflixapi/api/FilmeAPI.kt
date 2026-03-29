@@ -8,10 +8,14 @@ import retrofit2.http.Query
 
 interface FilmeAPI {
 
-    @GET("movie/latest?api_key=${RetrofitService.API_KEY}")
+    // https://api.themoviedb.org/3/ + movie/latest
+    //Interceptor: ?api_key
+    //@GET("movie/latest?api_key=${RetrofitService.API_KEY}")
+    @GET("movie/latest")
     suspend fun recuperarFilmeRecente() : Response<FilmeRecente>
 
-    @GET("movie/popular?api_key=${RetrofitService.API_KEY}")
+   // @GET("movie/popular?api_key=${RetrofitService.API_KEY}")
+    @GET("movie/popular")
     suspend fun recuperarFilmesPopulares(
         @Query("page") pagina: Int
     ) : Response<FilmeResposta>
